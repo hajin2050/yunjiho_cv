@@ -350,40 +350,45 @@
   document.querySelectorAll(".rv").forEach(el=>io.observe(el));
 </script>
 
-<!-- mouse interactions: cursor follower + portrait tilt (injected) -->
-<div id="cf-ring" aria-hidden="true"></div>
+
+
+
+<!-- mouse text-emphasis + portrait tilt (v2) -->
 <style>
-  #cf-ring{position:fixed;left:0;top:0;width:36px;height:36px;border:1.6px solid #E5A94E;border-radius:50%;
-    pointer-events:none;z-index:9999;transform:translate(-50%,-50%);opacity:0;
-    transition:width .22s ease,height .22s ease,background-color .22s ease,opacity .3s ease}
-  body.cf-on #cf-ring{opacity:.5}
-  #cf-ring.cf-lg{width:62px;height:62px;background-color:#E5A94E22}
-  @media (prefers-reduced-motion:reduce){#cf-ring{display:none!important}}
+  .we{display:inline-block;transition:transform .18s ease,color .18s ease,background-color .18s ease,letter-spacing .18s ease,box-shadow .18s ease;will-change:transform}
+  .we:hover{color:var(--accent);box-shadow:inset 0 -0.12em 0 var(--accent)}
+  @media (prefers-reduced-motion:reduce){.we{transition:color .18s ease,background-color .18s ease}}
 </style>
 <script>
 (function(){
-  var fine = matchMedia('(hover:hover) and (pointer:fine)').matches;
-  var reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
-  if(!fine || reduce) return;
-  var ring=document.getElementById('cf-ring');
-  var rx=innerWidth/2, ry=innerHeight/2, x=rx, y=ry;
-  addEventListener('mousemove',function(e){x=e.clientX;y=e.clientY;document.body.classList.add('cf-on');},{passive:true});
-  addEventListener('mouseout',function(e){if(!e.relatedTarget)document.body.classList.remove('cf-on');});
-  (function loop(){rx+=(x-rx)*.18;ry+=(y-ry)*.18;ring.style.transform='translate('+rx+'px,'+ry+'px) translate(-50%,-50%)';requestAnimationFrame(loop);})();
-  document.querySelectorAll('a,button,.portrait .frame').forEach(function(el){
-    el.addEventListener('mouseenter',function(){ring.classList.add('cf-lg');});
-    el.addEventListener('mouseleave',function(){ring.classList.remove('cf-lg');});
-  });
-  document.querySelectorAll('.portrait .frame').forEach(function(el){
-    el.style.transition='transform .25s cubic-bezier(.2,.8,.2,1)';
-    el.style.willChange='transform';
-    el.addEventListener('mousemove',function(e){
-      var r=el.getBoundingClientRect();
-      var px=(e.clientX-r.left)/r.width-0.5, py=(e.clientY-r.top)/r.height-0.5;
-      el.style.transform='perspective(820px) rotateY('+(px*9).toFixed(2)+'deg) rotateX('+(-py*9).toFixed(2)+'deg) translateY(-4px)';
+  var TARGETS="h1,h2,h3,h4,.nav-links a,nav a,.side-nav a,.tag,.chip,.eng-tag,.proj-tools span,.tl-meta .m,.cap-area,.module,.brand,.role,.eyebrow";
+  function splitWords(el){
+    if(el.dataset.we) return; el.dataset.we='1';
+    Array.prototype.slice.call(el.childNodes).forEach(function(node){
+      if(node.nodeType!==3) return;
+      var txt=node.textContent; if(!txt.trim()) return;
+      var frag=document.createDocumentFragment();
+      txt.split(/(\s+)/).forEach(function(part){
+        if(part==='') return;
+        if(/^\s+$/.test(part)) frag.appendChild(document.createTextNode(part));
+        else { var s=document.createElement('span'); s.className='we'; s.textContent=part; frag.appendChild(s); }
+      });
+      el.replaceChild(frag,node);
     });
-    el.addEventListener('mouseleave',function(){el.style.transform='';});
-  });
+  }
+  try{ document.querySelectorAll(TARGETS).forEach(splitWords); }catch(e){}
+  var fine = matchMedia('(hover:hover) and (pointer:fine)').matches;
+  if(fine){
+    document.querySelectorAll('.portrait .frame').forEach(function(el){
+      el.style.transition='transform .25s cubic-bezier(.2,.8,.2,1)'; el.style.willChange='transform';
+      el.addEventListener('mousemove',function(e){
+        var r=el.getBoundingClientRect();
+        var px=(e.clientX-r.left)/r.width-0.5, py=(e.clientY-r.top)/r.height-0.5;
+        el.style.transform='perspective(820px) rotateY('+(px*9).toFixed(2)+'deg) rotateX('+(-py*9).toFixed(2)+'deg) translateY(-4px)';
+      });
+      el.addEventListener('mouseleave',function(){el.style.transform='';});
+    });
+  }
 })();
 </script>
 
