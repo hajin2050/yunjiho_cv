@@ -206,10 +206,10 @@
 <div class="strip">
   <div class="wrap">
     <div class="stats rv">
-      <div class="stat"><div class="v">현장 중심</div><div class="l">직접 확인하고<br>직접 실행</div></div>
-      <div class="stat"><div class="v">빠른 실행</div><div class="l">발견 즉시<br>해결·대응</div></div>
-      <div class="stat"><div class="v ink">끈기·성실</div><div class="l">끝까지 책임지고<br>완수</div></div>
-      <div class="stat"><div class="v ink">신뢰 소통</div><div class="l">바이어·거래처와<br>신뢰 기반 협업</div></div>
+      <div class="stat"><div class="v"><span class="count" data-to="40">0</span>+</div><div class="l">관리 거래처 ·<br>해외 바이어</div></div>
+      <div class="stat"><div class="v"><span class="count" data-to="12">0</span>개국</div><div class="l">수출 진행<br>국가</div></div>
+      <div class="stat"><div class="v ink"><span class="count" data-to="99">0</span>%</div><div class="l">납기 준수율<br>(품질·일정)</div></div>
+      <div class="stat"><div class="v ink"><span class="count" data-to="24">0</span>h</div><div class="l">현장 이슈<br>평균 대응</div></div>
     </div>
   </div>
 </div>
@@ -348,6 +348,8 @@
   addEventListener("scroll",()=>nav.classList.toggle("scrolled", scrollY>40));
   const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target);}});},{threshold:.14});
   document.querySelectorAll(".rv").forEach(el=>io.observe(el));
+  const cio=new IntersectionObserver((es)=>{es.forEach(e=>{if(!e.isIntersecting)return;const el=e.target,to=+el.dataset.to,dur=1200,t0=performance.now();const tick=(t)=>{const p=Math.min(1,(t-t0)/dur);el.textContent=Math.round((1-Math.pow(1-p,3))*to);if(p<1)requestAnimationFrame(tick);else el.textContent=to;};requestAnimationFrame(tick);cio.unobserve(el);});},{threshold:.6});
+  document.querySelectorAll(".count").forEach(el=>cio.observe(el));
 </script>
 
 
